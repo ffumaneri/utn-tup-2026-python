@@ -1,7 +1,7 @@
 
 from typing import Annotated, Sequence
 
-from fastapi import Depends, FastAPI, Query
+from fastapi import Depends, FastAPI, HTTPException, Query
 from sqlmodel import Field, SQLModel, Session, create_engine, select
 
 # Se define el modelo
@@ -10,6 +10,7 @@ from sqlmodel import Field, SQLModel, Session, create_engine, select
 class User(SQLModel, table=True):
     id: int | None = Field(default=None, primary_key=True)
     name: str = Field(index=True)
+    age: int
 
 
 # Code above omitted 👆
@@ -29,19 +30,21 @@ def create_dummy_users():
     with Session(engine) as session:
         if session.exec(select(User)).first():
             return
-        names = [
-            "Martina Gómez",
-            "Santiago Fernández",
-            "Valentina López",
-            "Mateo Rodríguez",
-            "Camila Martínez",
-            "Lucas Pérez",
-            "Sofía García",
-            "Nicolás Sánchez",
-            "Julieta Díaz",
-            "Tomás Romero",
+        names_and_ages = [
+            ("Martina Gómez", 28),
+            ("Santiago Fernández", 34),
+            ("Valentina López", 22),
+            ("Mateo Rodríguez", 45),
+            ("Camila Martínez", 19),
+            ("Lucas Pérez", 31),
+            ("Sofía García", 27),
+            ("Nicolás Sánchez", 40),
+            ("Julieta Díaz", 24),
+            ("Tomás Romero", 37),
         ]
-        users = [User(name=name) for name in names]
+        users = [
+            User(name=name, age=age) for name, age in names_and_ages
+        ]
         session.add_all(users)
         session.commit()
 
@@ -78,3 +81,11 @@ def get_user(
 ) -> Sequence[User]:
     users = session.exec(select(User).offset(offset).limit(limit)).all()
     return users
+
+
+@app.get("/user/{user_id}")
+def get_user_by_id(user_id: int, session: SessionDep) -> User:
+    user = session.get(User, user_id)
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    return user
