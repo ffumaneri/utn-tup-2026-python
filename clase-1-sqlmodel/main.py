@@ -13,7 +13,6 @@ from sqlmodel import (
 
 # Se define el modelo
 
-
 class CountryBase(SQLModel):
     name: str = Field(index=True)
 
@@ -110,12 +109,12 @@ def create_user(user: User, session: SessionDep) -> User:
     return user
 
 
-@app.get("/user", response_model=Sequence[UserPublicWithCountry])
+@app.get("/user", response_model=Sequence[UserPublic])
 def get_user(
     session: SessionDep,
     offset: int = 0,
     limit: Annotated[int, Query(le=100)] = 100,
-) -> Sequence[User]:
+)-> Sequence[User]:
     statement = select(User).offset(offset).limit(limit)
     result = session.exec(statement)
     users = result.all()
@@ -138,7 +137,7 @@ def search_user(name: str, session: SessionDep) -> Sequence[User]:
 
 
 @app.get("/user_mayores")
-def search_mayores(session: SessionDep) -> Sequence[User]:
+def search_mayores(session: SessionDep)-> Sequence[User]:
     # TODO: users.age >= 18
     statement = select(User).where(User.age >= 18)
     result = session.exec(statement)

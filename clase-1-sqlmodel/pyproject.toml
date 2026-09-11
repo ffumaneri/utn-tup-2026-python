@@ -1,6 +1,12 @@
 [tool.ruff]
-line-length = 150
+line-length = 120
 exclude = [".venv", "__pycache__"]
 
 [tool.ruff.lint]
 select = ["E", "F", "I"]
+
+[tool.pyright]
+exclude = [".venv", "__pycache__"]
+venvPath = "."
+venv = ".venv"
+typeCheckingMode = "basic"
