@@ -1,14 +1,16 @@
 from typing import Annotated, Sequence
 
-from fastapi import APIRouter, HTTPException, Query
+from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlmodel import col, select
 
 from api.model.users import CreateUserRequest, CreateUserResponse, GetUserResponseWithCountry, GetUsersResponse
 from data.database import SessionDep
 from model.users import User
-from services.users import get_users
+from services.users import UserService
 
 router = APIRouter()
+
+UserServiceDep = Annotated[UserService, Depends(UserService)]
 
 @router.post("/user", response_model=CreateUserResponse)
 def create_user(req: CreateUserRequest, session: SessionDep) -> User:
@@ -21,11 +23,11 @@ def create_user(req: CreateUserRequest, session: SessionDep) -> User:
 
 @router.get("/user", response_model=Sequence[GetUsersResponse])
 def get_users_endpoint(
-    session: SessionDep,
+    service: UserServiceDep,
     offset: int = 0,
     limit: Annotated[int, Query(le=100)] = 100,
 )-> Sequence[User]:
-    return get_users(session, offset, limit)
+    return service.get_users(offset, limit)
     
 
 

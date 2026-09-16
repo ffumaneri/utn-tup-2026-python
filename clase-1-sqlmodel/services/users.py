@@ -1,15 +1,19 @@
 from typing import Annotated, Sequence
 
-from fastapi import Query
+from fastapi import Depends, Query
 
-from data.database import SessionDep
-from data.users import fetch_users
+from data.users import UserRepository
 from model.users import User
 
+UserRepositoryDep = Annotated[UserRepository, Depends(UserRepository)]
 
-def get_users(
-    session: SessionDep,
-    offset: int = 0,
-    limit: Annotated[int, Query(le=100)] = 100,
-)-> Sequence[User]:
-    return fetch_users(session, offset, limit)
+class UserService:
+    def __init__(self, repo: UserRepositoryDep):
+        self.repo = repo
+
+    def get_users(
+        self,
+        offset: int = 0,
+        limit: Annotated[int, Query(le=100)] = 100,
+    )-> Sequence[User]:
+        return self.repo.fetch_users(offset, limit)
