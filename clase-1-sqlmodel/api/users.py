@@ -6,6 +6,7 @@ from sqlmodel import col, select
 from api.model.users import CreateUserRequest, CreateUserResponse, GetUserResponseWithCountry, GetUsersResponse
 from data.database import SessionDep
 from model.users import User
+from services.users import get_users
 
 router = APIRouter()
 
@@ -19,15 +20,13 @@ def create_user(req: CreateUserRequest, session: SessionDep) -> User:
 
 
 @router.get("/user", response_model=Sequence[GetUsersResponse])
-def get_users(
+def get_users_endpoint(
     session: SessionDep,
     offset: int = 0,
     limit: Annotated[int, Query(le=100)] = 100,
 )-> Sequence[User]:
-    statement = select(User).offset(offset).limit(limit)
-    result = session.exec(statement)
-    users = result.all()
-    return users
+    return get_users(session, offset, limit)
+    
 
 
 @router.get("/user/{user_id}", response_model=GetUserResponseWithCountry)
