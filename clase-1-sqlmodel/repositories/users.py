@@ -3,8 +3,8 @@ from typing import Annotated, Sequence
 from fastapi import Query
 from sqlmodel import select
 
-from data.database import SessionDep
 from model.users import User
+from repositories.database import SessionDep
 
 
 class UserRepository:

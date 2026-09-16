@@ -7,9 +7,9 @@ from sqlmodel import (
 
 from api import users
 from api.users import User
-from data import database
-from data.database import create_db_and_tables
 from model.users import Country
+from repositories import database
+from repositories.database import create_db_and_tables
 
 app = FastAPI()
 app.include_router(users.router)

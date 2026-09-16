@@ -4,8 +4,8 @@ from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlmodel import col, select
 
 from api.model.users import CreateUserRequest, CreateUserResponse, GetUserResponseWithCountry, GetUsersResponse
-from data.database import SessionDep
 from model.users import User
+from repositories.database import SessionDep
 from services.users import UserService
 
 router = APIRouter()

@@ -2,8 +2,8 @@ from typing import Annotated, Sequence
 
 from fastapi import Depends, Query
 
-from data.users import UserRepository
 from model.users import User
+from repositories.users import UserRepository
 
 UserRepositoryDep = Annotated[UserRepository, Depends(UserRepository)]
 
