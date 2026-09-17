@@ -1,14 +1,35 @@
+from abc import ABC, abstractmethod
 from typing import Annotated, Sequence
 
-from fastapi import Depends, Query
+from fastapi import Query
 
-from model.users import User
-from repositories.users import UserRepository
-
-UserRepositoryDep = Annotated[UserRepository, Depends(UserRepository)]
+from dependencies import UserRepositoryDep
+from model.users import User, UserDB
 
 
-class UserService:
+class UserServiceInterface(ABC):
+    @abstractmethod
+    def get_users(self, offset: int, limit: int) -> Sequence[User]:
+        ...
+
+    @abstractmethod
+    def create_user(self, user: User) -> User:
+        ...
+
+    @abstractmethod
+    def get_user_by_id(self, user_id: int) -> UserDB | None:
+        ...
+
+    @abstractmethod
+    def search_users(self, name: str) -> Sequence[UserDB]:
+        ...
+
+    @abstractmethod
+    def search_mayores(self) -> Sequence[UserDB]:
+        ...
+
+
+class UserService(UserServiceInterface):
     def __init__(self, repo: UserRepositoryDep):
         self.repo = repo
 
@@ -21,3 +42,12 @@ class UserService:
 
     def create_user(self, user: User) -> User:
         return self.repo.create_user(user)
+
+    def get_user_by_id(self, user_id: int) -> UserDB | None:
+        return self.repo.get_by_id(user_id)
+
+    def search_users(self, name: str) -> Sequence[UserDB]:
+        return self.repo.search_by_name(name)
+
+    def search_mayores(self) -> Sequence[UserDB]:
+        return self.repo.fetch_adults()

@@ -1,10 +1,10 @@
 from typing import Annotated, Sequence
 
 from fastapi import Query
-from sqlmodel import select
+from sqlmodel import col, select
 
+from dependencies import SessionDep
 from model.users import User, UserDB
-from repositories.database import SessionDep
 
 
 class UserRepository:
@@ -27,3 +27,16 @@ class UserRepository:
         self.session.commit()
         self.session.refresh(user)
         return user
+
+    def get_by_id(self, user_id: int) -> UserDB | None:
+        return self.session.get(UserDB, user_id)
+
+    def search_by_name(self, name: str) -> Sequence[UserDB]:
+        statement = select(UserDB).where(col(UserDB.name).like("%{}%".format(name)))
+        result = self.session.exec(statement)
+        return result.all()
+
+    def fetch_adults(self) -> Sequence[UserDB]:
+        statement = select(UserDB).where(UserDB.age >= 18)
+        result = self.session.exec(statement)
+        return result.all()
