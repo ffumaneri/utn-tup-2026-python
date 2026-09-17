@@ -1,4 +1,3 @@
-from abc import ABC, abstractmethod
 from typing import Annotated, Sequence
 
 from fastapi import Depends, Query
@@ -8,13 +7,8 @@ from repositories.users import UserRepository
 
 UserRepositoryDep = Annotated[UserRepository, Depends(UserRepository)]
 
-class UserServiceInterface(ABC):
 
-    @abstractmethod
-    def get_users(self, offset: int, limit: int):
-        pass
-    
-class UserService(UserServiceInterface):
+class UserService:
     def __init__(self, repo: UserRepositoryDep):
         self.repo = repo
 
@@ -24,3 +18,6 @@ class UserService(UserServiceInterface):
         limit: Annotated[int, Query(le=100)] = 100,
     )-> Sequence[User]:
         return self.repo.fetch_users(offset, limit)
+
+    def create_user(self, user: User) -> User:
+        return self.repo.create_user(user)

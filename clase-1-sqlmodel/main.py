@@ -6,7 +6,7 @@ from sqlmodel import (
 )
 
 from api import users
-from api.users import User
+from api.users import UserDB
 from model.users import Country
 from repositories import database
 from repositories.database import create_db_and_tables
@@ -16,7 +16,7 @@ app.include_router(users.router)
 
 def create_dummy_data():
     with Session(database.engine) as session:
-        if session.exec(select(User)).first():
+        if session.exec(select(UserDB)).first():
             return
         country_names = [("Argentina", 1), ("Brasil", 2)]
         countries = [Country(name=name, id=id) for name, id in country_names]
@@ -36,7 +36,7 @@ def create_dummy_data():
             ("Julieta Díaz", 24, 2),
             ("Tomás Romero", 37, 2),
         ]
-        users = [User(name=name, age=age, country_id=country) for name, age, country in names_and_ages]
+        users = [UserDB(name=name, age=age, country_id=country) for name, age, country in names_and_ages]
         session.add_all(users)
         session.commit()
         
