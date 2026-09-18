@@ -1,11 +1,10 @@
 from typing import Annotated, Sequence
 
-from fastapi import Query
+from fastapi import Depends, Query
 from sqlmodel import col, select
 
-from dependencies import SessionDep
 from model.users import User, UserDB
-
+from repositories.database import SessionDep
 
 class UserRepository:
     def __init__(self, session: SessionDep):
@@ -40,3 +39,5 @@ class UserRepository:
         statement = select(UserDB).where(UserDB.age >= 18)
         result = self.session.exec(statement)
         return result.all()
+
+UserRepositoryDep = Annotated[UserRepository, Depends(UserRepository)]

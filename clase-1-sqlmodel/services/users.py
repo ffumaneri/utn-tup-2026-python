@@ -3,8 +3,8 @@ from typing import Annotated, Sequence
 
 from fastapi import Query
 
-from dependencies import UserRepositoryDep
 from model.users import User, UserDB
+from repositories.users import UserRepositoryDep
 
 
 class UserServiceInterface(ABC):

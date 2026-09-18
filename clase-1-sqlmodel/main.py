@@ -39,7 +39,7 @@ def create_dummy_data():
         users = [UserDB(name=name, age=age, country_id=country) for name, age, country in names_and_ages]
         session.add_all(users)
         session.commit()
-        
+
 @app.on_event("startup")
 def on_startup():
     create_db_and_tables()

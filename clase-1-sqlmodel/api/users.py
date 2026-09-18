@@ -40,3 +40,8 @@ def search_user(name: str, service: UserServiceDep) -> Sequence[UserDB]:
 @router.get("/user_mayores")
 def search_mayores(service: UserServiceDep)-> Sequence[UserDB]:
     return service.search_mayores()
+
+@router.patch("/user/{user_id}")
+def update_user():
+    pass
+
