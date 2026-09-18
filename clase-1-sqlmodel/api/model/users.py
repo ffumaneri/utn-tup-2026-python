@@ -21,6 +21,9 @@ class GetUsersResponse(SQLModel):
     id: int
     name: str
 
+class DeleteUserResponse(SQLModel):
+    msg: str
+
 class GetUserResponseWithCountry(GetUsersResponse):
     age: int
     password: str | None

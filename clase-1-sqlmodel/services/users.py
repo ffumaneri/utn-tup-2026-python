@@ -28,6 +28,13 @@ class UserServiceInterface(ABC):
     def search_mayores(self) -> Sequence[UserDB]:
         ...
 
+    @abstractmethod
+    def delete_user(self, user_id: int):
+        ...
+
+    @abstractmethod
+    def update_user(self, user_id: int, user: User) -> UserDB | None:
+        ...
 
 class UserService(UserServiceInterface):
     def __init__(self, repo: UserRepositoryDep):
@@ -51,3 +58,17 @@ class UserService(UserServiceInterface):
 
     def search_mayores(self) -> Sequence[UserDB]:
         return self.repo.fetch_adults()
+
+    def delete_user(self, user_id: int):
+        self.repo.delete_user(user_id)
+
+    def update_user(self, user_id: int, user: User) -> UserDB | None:
+        u = self.repo.update_user(user_id, user=user)
+        return u
+        
+
+
+    
+
+
+    

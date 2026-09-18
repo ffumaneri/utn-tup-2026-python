@@ -40,4 +40,21 @@ class UserRepository:
         result = self.session.exec(statement)
         return result.all()
 
+    def delete_user(self, user_id: int):
+        user = self.session.get(UserDB, user_id)
+        self.session.delete(user)
+        self.session.commit()
+
+    def update_user(self, user_id: int, user: User) -> UserDB | None:
+        userDb = self.session.get(UserDB, user_id)
+        if userDb:
+            userDb.age = user.age
+            userDb.name = user.name
+            userDb.country_id = user.country_id
+            self.session.add(userDb)
+            self.session.commit()
+            self.session.refresh(userDb)
+        return userDb
+
+
 UserRepositoryDep = Annotated[UserRepository, Depends(UserRepository)]
