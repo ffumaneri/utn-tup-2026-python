@@ -1,6 +1,6 @@
 from typing import Annotated, Sequence
 
-from fastapi import APIRouter, HTTPException, Query
+from fastapi import APIRouter, HTTPException, Query, Request
 
 from api.model.users import (
     CreateUserRequest,
