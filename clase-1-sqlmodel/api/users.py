@@ -2,7 +2,13 @@ from typing import Annotated, Sequence
 
 from fastapi import APIRouter, HTTPException, Query
 
-from api.model.users import CreateUserRequest, CreateUserResponse, DeleteUserResponse, GetUserResponseWithCountry, GetUsersResponse
+from api.model.users import (
+    CreateUserRequest,
+    CreateUserResponse,
+    DeleteUserResponse,
+    GetUserResponseWithCountry,
+    GetUsersResponse,
+)
 from dependencies import UserServiceDep
 from model.users import User, UserDB
 

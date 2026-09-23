@@ -1,10 +1,10 @@
 from typing import Annotated, Sequence
 
-from fastapi import Depends, Query
+from fastapi import Query
 from sqlmodel import col, select
 
+from dependencies import SessionDep
 from model.users import User, UserDB
-from repositories.database import SessionDep
 
 class UserRepository:
     def __init__(self, session: SessionDep):
@@ -55,6 +55,3 @@ class UserRepository:
             self.session.commit()
             self.session.refresh(userDb)
         return userDb
-
-
-UserRepositoryDep = Annotated[UserRepository, Depends(UserRepository)]
