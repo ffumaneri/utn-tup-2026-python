@@ -9,6 +9,7 @@ class CreateUserRequest(SQLModel):
     name: str
     age: int
     country_id: int | None
+    email: str
     password: str
 
 class CreateUserResponse(SQLModel):
@@ -26,5 +27,5 @@ class DeleteUserResponse(SQLModel):
 
 class GetUserResponseWithCountry(GetUsersResponse):
     age: int
-    password: str | None
+    email: str
     country: CountryResponse | None = None

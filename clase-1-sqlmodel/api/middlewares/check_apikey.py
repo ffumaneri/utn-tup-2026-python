@@ -8,7 +8,7 @@ logger = logging.getLogger(__name__)
 class CheckApikeyMW:
     async def verify_header_middleware(self, request: Request, call_next):
         # Let the docs UI through without an API key
-        if request.url.path in ("/docs", "/openapi.json"):
+        if request.url.path in ("/docs", "/openapi.json", "/login"):
             return await call_next(request)
 
         # Retrieve the header value (FastAPI normalizes headers to lowercase)

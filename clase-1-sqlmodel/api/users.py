@@ -1,6 +1,6 @@
 from typing import Annotated, Sequence
 
-from fastapi import APIRouter, Depends, HTTPException, Header, Query, Request
+from fastapi import APIRouter, Depends, Header, HTTPException, Query
 
 from api.model.users import (
     CreateUserRequest,
@@ -17,12 +17,12 @@ def verify_api_key_header(x_api_key: Annotated[str, Header()]) -> str:
     return x_api_key
 
 
-router = APIRouter(dependencies=[Depends(verify_api_key_header)])
+router = APIRouter(dependencies=[Depends(verify_api_key_header)], tags=["Users"])
 
 
 @router.post("/user", response_model=CreateUserResponse)
 def create_user(req: CreateUserRequest, service: UserServiceDep) -> User:
-    user = User(name=req.name, age=req.age, country_id=req.country_id)
+    user = User(name=req.name, age=req.age, email=req.email, password=req.email, country_id=req.country_id)
     return service.create_user(user)
 
 
@@ -63,7 +63,7 @@ def delete_user(user_id: int, service: UserServiceDep) -> DeleteUserResponse:
 
 @router.patch("/user/{user_id}", response_model=CreateUserResponse)
 def update_user(user_id: int, req: CreateUserRequest, service: UserServiceDep) -> UserDB | None:
-    user = User(name=req.name, age=req.age, country_id=req.country_id)
+    user = User(name=req.name, email=req.email, password=req.password, age=req.age, country_id=req.country_id)
     res = service.update_user(user_id, user)
     if res:
         return res

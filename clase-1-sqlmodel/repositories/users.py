@@ -6,6 +6,7 @@ from sqlmodel import col, select
 from dependencies import SessionDep
 from model.users import User, UserDB
 
+
 class UserRepository:
     def __init__(self, session: SessionDep):
         self.session = session
@@ -21,7 +22,7 @@ class UserRepository:
         return users
 
     def create_user(self, userBase: User) -> UserDB:
-        user = UserDB(name=userBase.name, age=userBase.age, country_id=userBase.country_id)
+        user = UserDB(name=userBase.name, age=userBase.age, email= userBase.email, password=userBase.password, country_id=userBase.country_id)
         self.session.add(user)
         self.session.commit()
         self.session.refresh(user)
@@ -29,6 +30,11 @@ class UserRepository:
 
     def get_by_id(self, user_id: int) -> UserDB | None:
         return self.session.get(UserDB, user_id)
+
+    def get_by_email(self, email: str) -> UserDB | None:
+        statement = select(UserDB).where(col(UserDB.email) == email)
+        result = self.session.exec(statement)
+        return result.first()
 
     def search_by_name(self, name: str) -> Sequence[UserDB]:
         statement = select(UserDB).where(col(UserDB.name).like("%{}%".format(name)))

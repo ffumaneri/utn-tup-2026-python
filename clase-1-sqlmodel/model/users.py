@@ -1,6 +1,7 @@
 # Se define el modelo
 
 # Nivel de negocios
+from pydantic import EmailStr
 from sqlmodel import Field, Relationship, SQLModel
 
 
@@ -18,7 +19,8 @@ class User(SQLModel):
     name: str = Field(index=True)
     age: int
     country_id: int | None = Field(default=None, foreign_key="country.id")
-    password: str | None = Field(default=None)
+    password: str = Field(max_length=10, min_length=4)
+    email: EmailStr = Field(unique=True, index=True)
 
 # Nivel de base de datos
 class UserDB(User, table=True):
