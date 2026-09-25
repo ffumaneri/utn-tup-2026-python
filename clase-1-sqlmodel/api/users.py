@@ -1,6 +1,6 @@
 from typing import Annotated, Sequence
 
-from fastapi import APIRouter, HTTPException, Query, Request
+from fastapi import APIRouter, Depends, HTTPException, Header, Query, Request
 
 from api.model.users import (
     CreateUserRequest,
@@ -12,7 +12,13 @@ from api.model.users import (
 from dependencies import UserServiceDep
 from model.users import User, UserDB
 
-router = APIRouter()
+
+def verify_api_key_header(x_api_key: Annotated[str, Header()]) -> str:
+    return x_api_key
+
+
+router = APIRouter(dependencies=[Depends(verify_api_key_header)])
+
 
 @router.post("/user", response_model=CreateUserResponse)
 def create_user(req: CreateUserRequest, service: UserServiceDep) -> User:
