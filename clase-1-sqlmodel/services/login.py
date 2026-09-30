@@ -1,4 +1,5 @@
 from dependencies import UserRepositoryDep
+from utils.hash import verify_password
 
 
 class LoginService():
@@ -8,5 +9,5 @@ class LoginService():
         user = self.repo.get_by_email(email)
         if not user:
             return False
-        return user.password == pwd
+        return verify_password(pwd, user.password)
         

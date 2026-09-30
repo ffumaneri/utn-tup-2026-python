@@ -5,6 +5,7 @@ from sqlmodel import col, select
 
 from dependencies import SessionDep
 from model.users import User, UserDB
+from utils.hash import hash_password
 
 
 class UserRepository:
@@ -22,7 +23,8 @@ class UserRepository:
         return users
 
     def create_user(self, userBase: User) -> UserDB:
-        user = UserDB(name=userBase.name, age=userBase.age, email= userBase.email, password=userBase.password, country_id=userBase.country_id)
+        hashed_pwd = hash_password(userBase.password)
+        user = UserDB(name=userBase.name, age=userBase.age, email= userBase.email, password=hashed_pwd, country_id=userBase.country_id)
         self.session.add(user)
         self.session.commit()
         self.session.refresh(user)

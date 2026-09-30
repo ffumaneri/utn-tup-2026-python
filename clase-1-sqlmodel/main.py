@@ -14,6 +14,7 @@ from api.users import UserDB
 from model.users import Country
 from repositories import database
 from repositories.database import create_db_and_tables
+from utils.hash import hash_password
 
 logger = logging.getLogger(__name__)
 
@@ -59,7 +60,8 @@ def create_dummy_data():
             ("Julieta Díaz", "jdi@email.com", 24, 2),
             ("Tomás Romero", "tro@email.com", 37, 2),
         ]
-        users = [UserDB(name=name, email=email, age=age, country_id=country, password="123") for name, email, age, country in names_and_ages]
+        hashed_pwd = hash_password("123")
+        users = [UserDB(name=name, email=email, age=age, country_id=country, password=hashed_pwd) for name, email, age, country in names_and_ages]
         session.add_all(users)
         session.commit()
 

@@ -19,7 +19,7 @@ class User(SQLModel):
     name: str = Field(index=True)
     age: int
     country_id: int | None = Field(default=None, foreign_key="country.id")
-    password: str = Field(max_length=10, min_length=4)
+    password: str = Field(max_length=72, min_length=4)
     email: EmailStr = Field(unique=True, index=True)
 
 # Nivel de base de datos
