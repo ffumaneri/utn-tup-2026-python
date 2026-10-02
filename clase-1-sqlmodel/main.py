@@ -8,7 +8,6 @@ from sqlmodel import (
 )
 
 from api import login, users
-from api.middlewares.check_apikey import CheckApikeyMW
 from api.middlewares.counter import CounterMW
 from api.users import UserDB
 from model.users import Country
@@ -28,15 +27,11 @@ app.include_router(users.router)
 app.include_router(login.router)
 
 counterMW = CounterMW()
-checkApikeyMW = CheckApikeyMW()
 
 @app.middleware("counter")
 async def middle_ware_prueba(request: Request, call_next):
     return await counterMW.middle_ware_prueba(request, call_next)
 
-@app.middleware("apikey")
-async def middle_ware_apikey(request: Request, call_next):
-    return await checkApikeyMW.verify_header_middleware(request, call_next)
 
 def create_dummy_data():
     with Session(database.engine) as session:
