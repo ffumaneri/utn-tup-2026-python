@@ -8,6 +8,7 @@ from sqlmodel import (
 )
 
 from api import login, users
+from api.middlewares.auth import JWTAuthMW
 from api.middlewares.counter import CounterMW
 from api.users import UserDB
 from model.users import Country
@@ -27,6 +28,13 @@ app.include_router(users.router)
 app.include_router(login.router)
 
 counterMW = CounterMW()
+jwtAuthMW = JWTAuthMW()
+
+
+@app.middleware("http")
+async def jwt_auth_middleware(request: Request, call_next):
+    return await jwtAuthMW.check_jwt(request, call_next)
+
 
 @app.middleware("counter")
 async def middle_ware_prueba(request: Request, call_next):
