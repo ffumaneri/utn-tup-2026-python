@@ -1,6 +1,7 @@
 from typing import Annotated, Sequence
 
-from fastapi import APIRouter, HTTPException, Query
+from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi.security import HTTPBearer
 
 from api.model.users import (
     CreateUserRequest,
@@ -9,12 +10,12 @@ from api.model.users import (
     GetUserResponseWithCountry,
     GetUsersResponse,
 )
-from dependencies import UserServiceDep
+from dependencies import CurrentUserIdDep, UserServiceDep
 from model.users import User, UserDB
 
 
 
-router = APIRouter(tags=["Users"])
+router = APIRouter(tags=["Users"], dependencies=[Depends(HTTPBearer())])
 
 
 @router.post("/user", response_model=CreateUserResponse)
@@ -44,6 +45,11 @@ def get_user_by_id(user_id: int, service: UserServiceDep) -> UserDB:
 @router.get("/user/search/{name}")
 def search_user(name: str, service: UserServiceDep) -> Sequence[UserDB]:
     return service.search_users(name)
+
+
+@router.get("/user/me/id")
+def get_my_id(me_id: CurrentUserIdDep) -> dict[str, int]:
+    return {"id": me_id}
 
 
 @router.get("/user_mayores")
