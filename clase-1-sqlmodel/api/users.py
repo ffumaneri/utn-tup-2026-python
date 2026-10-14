@@ -13,8 +13,6 @@ from api.model.users import (
 from dependencies import CurrentUserIdDep, UserServiceDep
 from model.users import User, UserDB
 
-
-
 router = APIRouter(tags=["Users"], dependencies=[Depends(HTTPBearer())])
 
 
