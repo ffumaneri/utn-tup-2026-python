@@ -1,19 +1,20 @@
 
 import logging
 
-from fastapi import FastAPI, Request
+from fastapi import Depends, FastAPI, Request
 from sqlmodel import (
     Session,
     select,
 )
 
-from api import login, users
+from api import login, permissions, roles, users
 from api.middlewares.auth import JWTAuthMW
 from api.middlewares.counter import CounterMW
 from api.users import UserDB
 from model.users import Country
 from repositories import database
 from repositories.database import create_db_and_tables
+from repositories.seed import seed_roles_and_permissions, seed_user_roles
 from utils.hash import hash_password
 
 logger = logging.getLogger(__name__)
@@ -23,17 +24,15 @@ logging.basicConfig(
     format="%(asctime)s [%(name)s] %(levelname)s: %(message)s",
 )
 
-app = FastAPI()
-app.include_router(users.router)
-app.include_router(login.router)
-
-counterMW = CounterMW()
 jwtAuthMW = JWTAuthMW()
 
+app = FastAPI(dependencies=[Depends(jwtAuthMW.check_jwt)])
+app.include_router(users.router)
+app.include_router(login.router)
+app.include_router(roles.router)
+app.include_router(permissions.router)
 
-@app.middleware("http")
-async def jwt_auth_middleware(request: Request, call_next):
-    return await jwtAuthMW.check_jwt(request, call_next)
+counterMW = CounterMW()
 
 
 @app.middleware("counter")
@@ -64,12 +63,21 @@ def create_dummy_data():
             ("Tomás Romero", "tro@email.com", 37, 2),
         ]
         hashed_pwd = hash_password("123")
-        users = [UserDB(name=name, email=email, age=age, country_id=country, password=hashed_pwd) for name, email, age, country in names_and_ages]
+        users = [
+            UserDB(name=name, email=email, age=age, country_id=country, password=hashed_pwd)
+            for name, email, age, country in names_and_ages
+        ]
         session.add_all(users)
         session.commit()
+
+def create_roles_and_permissions():
+    with Session(database.engine) as session:
+        seed_roles_and_permissions(session)
+        seed_user_roles(session)
 
 @app.on_event("startup")
 def on_startup():
     create_db_and_tables()
     create_dummy_data()
+    create_roles_and_permissions()
 

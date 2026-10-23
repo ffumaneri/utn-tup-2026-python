@@ -1,6 +1,7 @@
 # Nivel de API
 from sqlmodel import SQLModel
 
+from api.model.roles import RoleResponse
 from model.users import CountryBase
 
 
@@ -29,3 +30,4 @@ class GetUserResponseWithCountry(GetUsersResponse):
     age: int
     email: str
     country: CountryResponse | None = None
+    roles: list[RoleResponse] = []

@@ -1,33 +1,29 @@
-from fastapi import Request
-from fastapi.responses import JSONResponse
+from fastapi import HTTPException, Request
 
 from dependencies import get_jwt_service
 
 
 class JWTAuthMW:
+    """Se registra como dependencia global: corre después del ruteo, cuando ya se conoce el endpoint."""
+
     def __init__(self):
         self.jwt_service = get_jwt_service()
 
-    def _is_protected(self, path: str) -> bool:
-        return path == "/user" or path.startswith("/user/") or path == "/user_mayores"
+    def _is_protected(self, request: Request) -> bool:
+        # El endpoint ya fue resuelto por el router; se lee la marca que deja @protected.
+        route = request.scope.get("route")
+        return getattr(getattr(route, "endpoint", None), "__protected__", False)
 
-    async def check_jwt(self, request: Request, call_next):
-        if not self._is_protected(request.url.path):
-            return await call_next(request)
+    async def check_jwt(self, request: Request) -> None:
+        if not self._is_protected(request):
+            return
 
         authorization = request.headers.get("Authorization")
         if not authorization or not authorization.startswith("Bearer "):
-            return JSONResponse(
-                status_code=401,
-                content={"detail": "Missing or invalid Authorization header"},
-            )
+            raise HTTPException(status_code=401, detail="Missing or invalid Authorization header")
 
         payload = self.jwt_service.decode_token(authorization.removeprefix("Bearer "))
         if payload is None:
-            return JSONResponse(
-                status_code=401,
-                content={"detail": "Invalid or expired token"},
-            )
+            raise HTTPException(status_code=401, detail="Invalid or expired token")
 
         request.state.jwt_payload = payload
-        return await call_next(request)

@@ -4,6 +4,7 @@ from fastapi import Query
 from sqlmodel import col, select
 
 from dependencies import SessionDep
+from model.roles import REGULAR_ROLE, Role
 from model.users import User, UserDB
 from utils.hash import hash_password
 
@@ -24,7 +25,15 @@ class UserRepository:
 
     def create_user(self, userBase: User) -> UserDB:
         hashed_pwd = hash_password(userBase.password)
-        user = UserDB(name=userBase.name, age=userBase.age, email= userBase.email, password=hashed_pwd, country_id=userBase.country_id)
+        regular = self.session.exec(select(Role).where(col(Role.name) == REGULAR_ROLE)).first()
+        user = UserDB(
+            name=userBase.name,
+            age=userBase.age,
+            email=userBase.email,
+            password=hashed_pwd,
+            country_id=userBase.country_id,
+            roles=[regular] if regular else [],
+        )
         self.session.add(user)
         self.session.commit()
         self.session.refresh(user)
@@ -63,3 +72,19 @@ class UserRepository:
             self.session.commit()
             self.session.refresh(userDb)
         return userDb
+
+    def add_role(self, user: UserDB, role: Role) -> UserDB:
+        if role not in user.roles:
+            user.roles.append(role)
+            self.session.add(user)
+            self.session.commit()
+            self.session.refresh(user)
+        return user
+
+    def remove_role(self, user: UserDB, role: Role) -> UserDB:
+        if role in user.roles:
+            user.roles.remove(role)
+            self.session.add(user)
+            self.session.commit()
+            self.session.refresh(user)
+        return user

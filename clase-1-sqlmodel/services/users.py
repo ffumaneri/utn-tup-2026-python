@@ -4,6 +4,7 @@ from typing import Annotated, Sequence
 from fastapi import Query
 
 from dependencies import UserRepositoryDep
+from model.roles import Role
 from model.users import User, UserDB
 
 
@@ -36,6 +37,14 @@ class UserServiceInterface(ABC):
     def update_user(self, user_id: int, user: User) -> UserDB | None:
         ...
 
+    @abstractmethod
+    def add_role(self, user: UserDB, role: Role) -> UserDB:
+        ...
+
+    @abstractmethod
+    def remove_role(self, user: UserDB, role: Role) -> UserDB:
+        ...
+
 class UserService(UserServiceInterface):
     def __init__(self, repo: UserRepositoryDep):
         self.repo = repo
@@ -65,10 +74,9 @@ class UserService(UserServiceInterface):
     def update_user(self, user_id: int, user: User) -> UserDB | None:
         u = self.repo.update_user(user_id, user=user)
         return u
-        
 
+    def add_role(self, user: UserDB, role: Role) -> UserDB:
+        return self.repo.add_role(user, role)
 
-    
-
-
-    
+    def remove_role(self, user: UserDB, role: Role) -> UserDB:
+        return self.repo.remove_role(user, role)

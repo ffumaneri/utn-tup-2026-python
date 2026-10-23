@@ -6,6 +6,7 @@ from sqlmodel.pool import StaticPool
 from main import app
 from model.users import Country, UserDB
 from repositories.database import get_session
+from repositories.seed import seed_roles_and_permissions, seed_user_roles
 from utils.hash import hash_password
 
 
@@ -42,6 +43,9 @@ def seed_fixture(session: Session):
         UserDB(name="Camila Martínez", email="cma@email.com", age=15, country_id=2, password=pwd),
     ])
     session.commit()
+
+    seed_roles_and_permissions(session)
+    seed_user_roles(session)
 
 @pytest.fixture(name="auth_headers")
 def auth_headers_fixture(client: TestClient, seed):

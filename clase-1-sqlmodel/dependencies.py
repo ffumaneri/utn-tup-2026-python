@@ -17,6 +17,22 @@ from services.users import UserService, UserServiceInterface  # noqa: E402
 
 UserServiceDep = Annotated[UserServiceInterface, Depends(UserService)]
 
+from repositories.roles import RoleRepository  # noqa: E402
+
+RoleRepositoryDep = Annotated[RoleRepository, Depends(RoleRepository)]
+
+from services.roles import RoleService, RoleServiceInterface  # noqa: E402
+
+RoleServiceDep = Annotated[RoleServiceInterface, Depends(RoleService)]
+
+from repositories.permissions import PermissionRepository  # noqa: E402
+
+PermissionRepositoryDep = Annotated[PermissionRepository, Depends(PermissionRepository)]
+
+from services.permissions import PermissionService, PermissionServiceInterface  # noqa: E402
+
+PermissionServiceDep = Annotated[PermissionServiceInterface, Depends(PermissionService)]
+
 def get_jwt_service():
     return JWTService("my-secret-key")
 
