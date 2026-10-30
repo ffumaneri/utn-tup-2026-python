@@ -33,7 +33,7 @@ def client_fixture(session: Session):
 
 @pytest.fixture(name="seed")
 def seed_fixture(session: Session):
-    session.add_all([Country(id=1, name="Argentina"), Country(id=2, name="Brasil")])
+    session.add_all([Country(id=1, name="Argentina"), Country(id=2, name="Brasil")]) # type: ignore
     session.commit()
 
     pwd = hash_password("123")      # las contraseñas se guardan hasheadas
@@ -50,4 +50,9 @@ def seed_fixture(session: Session):
 @pytest.fixture(name="auth_headers")
 def auth_headers_fixture(client: TestClient, seed):
     res = client.post("/login", json={"email": "mgomez@email.com","password": "123"})
+    return {"Authorization": f"Bearer {res.json()["token"]}"}
+
+@pytest.fixture(name="auth_headers_regular")
+def auth_headers_regular_fixture(client: TestClient, seed):
+    res = client.post("/login", json={"email": "sfer@email.com","password": "123"})
     return {"Authorization": f"Bearer {res.json()["token"]}"}

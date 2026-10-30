@@ -40,14 +40,16 @@ def permission_check(p: str):
     return check
 
 
-@router.post("/user", response_model=CreateUserResponse)
+@router.post("/user", response_model=CreateUserResponse,
+               dependencies=[Depends(permission_check("write_users"))])
 @protected
 def create_user(req: CreateUserRequest, service: UserServiceDep) -> User:
-    user = User(name=req.name, age=req.age, email=req.email, password=req.email, country_id=req.country_id)
+    user = User(name=req.name, age=req.age, email=req.email, password=req.password, country_id=req.country_id)
     return service.create_user(user)
 
 
-@router.get("/user", response_model=Sequence[GetUsersResponse])
+@router.get("/user", response_model=Sequence[GetUsersResponse],
+               dependencies=[Depends(permission_check("read_users"))])
 @protected
 def get_users_endpoint(
     service: UserServiceDep,
@@ -58,7 +60,8 @@ def get_users_endpoint(
     
 
 
-@router.get("/user/{user_id}", response_model=GetUserResponseWithCountry)
+@router.get("/user/{user_id}", response_model=GetUserResponseWithCountry,
+               dependencies=[Depends(permission_check("read_users"))])
 @protected
 def get_user_by_id(user_id: int, service: UserServiceDep) -> UserDB:
     user = service.get_user_by_id(user_id)
@@ -67,19 +70,22 @@ def get_user_by_id(user_id: int, service: UserServiceDep) -> UserDB:
     return user
 
 
-@router.get("/user/search/{name}")
+@router.get("/user/search/{name}",
+               dependencies=[Depends(permission_check("read_users"))])
 @protected
 def search_user(name: str, service: UserServiceDep) -> Sequence[UserDB]:
     return service.search_users(name)
 
 
-@router.get("/user/me/id")
+@router.get("/user/me/id",
+               dependencies=[Depends(permission_check("read_users"))])
 @protected
 def get_my_id(me_id: CurrentUserIdDep) -> dict[str, int]:
     return {"id": me_id}
 
 
-@router.get("/user_mayores")
+@router.get("/user_mayores",
+               dependencies=[Depends(permission_check("read_users"))])
 @protected
 def search_mayores(service: UserServiceDep)-> Sequence[UserDB]:
     return service.search_mayores()
@@ -107,7 +113,8 @@ def update_user(user_id: int, req: CreateUserRequest, service: UserServiceDep) -
     raise HTTPException(status_code=404, detail="User not found")
 
 
-@router.post("/user/{user_id}/role/{role_id}", response_model=GetUserResponseWithCountry)
+@router.post("/user/{user_id}/role/{role_id}", response_model=GetUserResponseWithCountry,
+               dependencies=[Depends(permission_check("write_users"))])
 @protected
 def add_role_to_user(user_id: int, role_id: int, service: UserServiceDep, role_service: RoleServiceDep) -> UserDB:
     user = service.get_user_by_id(user_id)
@@ -119,11 +126,11 @@ def add_role_to_user(user_id: int, role_id: int, service: UserServiceDep, role_s
     return service.add_role(user, role)
 
 
-@router.delete("/user/{user_id}/role/{role_id}", response_model=GetUserResponseWithCountry)
+@router.delete("/user/{user_id}/role/{role_id}", response_model=GetUserResponseWithCountry,
+               dependencies=[Depends(permission_check("update_users"))])
 @protected
 def remove_role_from_user(user_id: int, role_id: int, service: UserServiceDep, 
                           role_service: RoleServiceDep) -> UserDB:
-
 
     user = service.get_user_by_id(user_id)
     if not user:
