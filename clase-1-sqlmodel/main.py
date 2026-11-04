@@ -2,6 +2,7 @@
 import logging
 
 from fastapi import Depends, FastAPI, Request
+from fastapi.middleware.cors import CORSMiddleware
 from sqlmodel import (
     Session,
     select,
@@ -38,6 +39,16 @@ counterMW = CounterMW()
 @app.middleware("counter")
 async def middle_ware_prueba(request: Request, call_next):
     return await counterMW.middle_ware_prueba(request, call_next)
+
+
+# Registered last so it is the outermost middleware and answers preflight
+# requests before auth runs.
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_methods=["*"],
+    allow_headers=["*", "Authorization"],
+)
 
 
 def create_dummy_data():
